@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        background: black;
+      }
+      canvas {
+        background-color: white;
+      }
+    </style>
+    <script>
+      function preventDefault(e) {
+        e.preventDefault();
+      }
+    </script>
+  </head>
+  <body>
+    <canvas className="bevy-instance__canvas" id="bevy" onContextMenu="preventDefault"></canvas>
+  </body>
+  <script type="module">
+    import init from './public/app.js'
+    init()
+  </script>
+</html>
