@@ -4,34 +4,11 @@ use bevy::{
   text::TextPlugin, time::TimePlugin, ui::UiPlugin, winit::WinitPlugin,
 };
 
-pub fn setup_graphics(
-  mut commands: Commands,
-  mut meshes: ResMut<Assets<Mesh>>,
-  mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-  commands.spawn(Camera3dBundle {
-    transform: Transform::from_xyz(-30.0, 30.0, 100.0).looking_at(Vec3::new(0.0, 10.0, 0.0), Vec3::Y),
-    ..Default::default()
-  });
+mod scene;
+pub use scene::*;
 
-  commands.spawn(PointLightBundle {
-    point_light: PointLight {
-      intensity: 9000.0,
-      range: 100.,
-      shadows_enabled: true,
-      ..Default::default()
-    },
-    transform: Transform::from_xyz(8.0, 16.0, 8.0),
-    ..Default::default()
-  });
-
-  commands.spawn(PbrBundle {
-    mesh: meshes.add(shape::Plane::from_size(50.0).into()),
-    material: materials.add(Color::SILVER.into()),
-    transform: Transform::from_xyz(0.0, -10.0, 0.0),
-    ..Default::default()
-  });
-}
+pub mod game;
+pub use game::GameplayPlugins;
 
 pub struct BevyPlugins;
 
