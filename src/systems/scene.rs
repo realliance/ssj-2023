@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use super::game::{Product, ProductBuilder, SpawnerBuilder};
+use super::game::{Consumer, Product, ProductBuilder, SpawnerBuilder};
 
 pub fn setup_graphics(
   mut commands: Commands,
@@ -26,20 +26,12 @@ pub fn setup_graphics(
 
   commands
     .spawn(PbrBundle {
-      mesh: meshes.add(shape::Box::new(50.0, 1.0, 50.0).into()),
-      material: materials.add(Color::WHITE.into()),
-      transform: Transform::from_xyz(0.0, -10.0, 0.0).with_rotation(Quat::from_axis_angle(Vec3::Z, 85.0)),
-      ..Default::default()
-    })
-    .insert(RigidBody::Fixed)
-    .insert(Collider::cuboid(25.0, 0.5, 25.0));
-
-  commands
-    .spawn(PbrBundle {
       mesh: meshes.add(shape::Cube::new(4.0).into()),
       material: materials.add(Color::BLUE.into()),
-      transform: Transform::from_xyz(0.0, 10.0, 5.0),
+      transform: Transform::from_xyz(0.0, 25.0, 5.0),
       ..Default::default()
     })
     .insert(SpawnerBuilder::default().build().unwrap());
+
+  Consumer::into_entity(&mut commands, &mut meshes, &mut materials, [0.0, 0.0, 5.0]);
 }

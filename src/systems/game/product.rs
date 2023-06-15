@@ -13,12 +13,12 @@ pub enum ProductShape {
 }
 
 impl ProductShape {
-  pub fn base_value(&self) -> u32 {
+  pub fn base_value(&self) -> f32 {
     match self {
-      ProductShape::Sphere => 1,
-      ProductShape::Cube => 2,
-      ProductShape::Cylinder => 3,
-      ProductShape::Disc => 4,
+      ProductShape::Sphere => 1.0,
+      ProductShape::Cube => 1.5,
+      ProductShape::Cylinder => 2.0,
+      ProductShape::Disc => 2.5,
     }
   }
 
@@ -72,6 +72,7 @@ impl Default for ProductShape {
 #[builder(default)]
 pub struct Product {
   shape: ProductShape,
+  hit_mult: f32,
   mass: f32,
   bounce: f32,
   friction: f32,
@@ -83,6 +84,7 @@ impl Default for Product {
     Self {
       shape: Default::default(),
       mass: 1.0,
+      hit_mult: 1.0,
       bounce: 1.0,
       friction: 1.0,
       size: 1.0,
@@ -91,6 +93,19 @@ impl Default for Product {
 }
 
 impl Product {
+  pub fn payment(&self) -> f32 {
+    (self.shape.base_value()
+      * self.hit_mult
+      * (1.0 + (self.bounce - 1.0).abs())
+      * (1.0 + (self.friction - 1.0).abs())
+      * (1.0 + (self.mass - 1.0).abs()))
+    .floor()
+  }
+
+  pub fn add_hit_mult(&mut self, force_mag: f32) {
+    self.hit_mult += force_mag / 100.0;
+  }
+
   pub fn into_entity<V: Into<Vec3> + Clone>(
     self,
     commands: &mut Commands,
@@ -110,6 +125,7 @@ impl Product {
         coefficient: self.friction,
         ..Default::default()
       })
+      .insert(ActiveEvents::CONTACT_FORCE_EVENTS)
       .insert(self.shape.pbr_bundle(position.into(), self.size, meshes, materials))
       .id()
   }

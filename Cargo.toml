@@ -14,7 +14,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 bevy = "0.10"
-bevy_rapier3d = { version = "0.21", features = ["enhanced-determinism", "debug-render-3d", "wasm-bindgen", "serde-serialize"] }
+bevy_rapier3d = { version = "0.21", features = ["debug-render-3d", "wasm-bindgen", "serde-serialize"] }
 cfg-if = "1.0"
 rand = "0.8"
 smooth-bevy-cameras = "0.8"
@@ -30,5 +30,5 @@ opt-level = "z"
 lto = "fat"
 codegen-units = 1
 
-[profile.dev.package.bevy_rapier3d]
+[profile.dev.package."*"]
 opt-level = 3
