@@ -12,6 +12,12 @@ pub use consumer::*;
 mod collision;
 pub use collision::*;
 
+mod camera;
+pub use camera::*;
+
+mod ui;
+pub use ui::*;
+
 pub struct GameplayPlugins;
 
 impl PluginGroup for GameplayPlugins {
@@ -19,5 +25,7 @@ impl PluginGroup for GameplayPlugins {
     PluginGroupBuilder::start::<Self>()
       .add(SpawnerPlugin)
       .add(CollisionPlugin)
+      .add(CameraPlugin)
+      .add(UiPlugin)
   }
 }

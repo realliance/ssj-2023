@@ -24,6 +24,8 @@ impl Consumer {
       .insert(Self)
       .insert(RigidBody::Fixed)
       .insert(Collider::cuboid(SQUARE_SIZE / 2.0, 0.25, SQUARE_SIZE / 2.0))
+      .insert(bevy_mod_picking::PickableBundle::default())
+      .insert(bevy_transform_gizmo::GizmoTransformable)
       .id()
   }
 }
