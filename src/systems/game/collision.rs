@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use super::{Consumer, Product};
+use super::{Consumer, GameState, Product};
 
 fn display_events(
   mut commands: Commands,
+  mut state: ResMut<GameState>,
   mut contact_force_events: EventReader<ContactForceEvent>,
   is_consumer_sensor: Query<Entity, With<Consumer>>,
   mut product_query: Query<&mut Product>,
@@ -36,7 +37,7 @@ fn display_events(
       .or_else(|_| is_consumer_sensor.get(event.collider2));
 
     if sensor.is_ok() {
-      info!("Would've been paid {}", product.payment());
+      state.currency += product.payment();
       commands.entity(product_ent).despawn();
     }
   }
