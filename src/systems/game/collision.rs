@@ -1,9 +1,9 @@
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::*;
+use bevy_rapier3d::{prelude::*, rapier::prelude::CollisionEventFlags};
 
-use super::{Consumer, GameState, Product};
+use super::{Consumer, GameState, MutatorScreen, Product};
 
-fn display_events(
+fn contact_force_events(
   mut commands: Commands,
   mut state: ResMut<GameState>,
   mut contact_force_events: EventReader<ContactForceEvent>,
@@ -26,7 +26,7 @@ fn display_events(
       product_query.get_mut(event.collider2).unwrap()
     } else {
       // Exit, nothing to do here
-      return;
+      continue;
     };
 
     product.add_hit_mult(event.max_force_magnitude);
@@ -43,6 +43,59 @@ fn display_events(
   }
 }
 
+fn collision_events(
+  mut collision_events: EventReader<CollisionEvent>,
+  state: Res<GameState>,
+  mut product_query: Query<(
+    &mut Product,
+    &mut Restitution,
+    &mut Friction,
+    &mut ColliderMassProperties,
+    &mut Handle<Mesh>,
+    &mut Collider,
+  )>,
+  sensor_query: Query<&MutatorScreen>,
+  mut meshes: ResMut<Assets<Mesh>>,
+) {
+  for event in collision_events.iter() {
+    if !state.run {
+      continue;
+    }
+
+    if let CollisionEvent::Started(collider1, collider2, flags) = event {
+      if flags != &CollisionEventFlags::SENSOR {
+        continue;
+      }
+
+      let is_coll_1_product = product_query.get(*collider1).is_ok();
+      let is_coll_2_product = product_query.get(*collider2).is_ok();
+
+      let mutator_screen;
+      let (mut product, mut bounce, mut friction, mut mass, mut mesh, mut collider) = if is_coll_1_product {
+        mutator_screen = sensor_query.get(*collider2).unwrap();
+        product_query.get_mut(*collider1).unwrap()
+      } else if is_coll_2_product {
+        mutator_screen = sensor_query.get(*collider1).unwrap();
+        product_query.get_mut(*collider2).unwrap()
+      } else {
+        // Exit, nothing to do here
+        return;
+      };
+
+      match mutator_screen {
+        MutatorScreen::Bounce(value) => bounce.coefficient = product.modify_bounce(*value),
+        MutatorScreen::Mass(value) => *mass = ColliderMassProperties::Mass(product.modify_mass(*value)),
+        MutatorScreen::Friction(value) => friction.coefficient = product.modify_friction(*value),
+        MutatorScreen::Shape(new_shape) => {
+          let (new_mesh, new_collider) = product.modify_shape(*new_shape, &mut meshes);
+          *mesh = new_mesh;
+          *collider = new_collider;
+        },
+      }
+    }
+  }
+}
+
 fn configure_rapier(mut rapier_config: ResMut<RapierConfiguration>) {
   rapier_config.timestep_mode = TimestepMode::Interpolated {
     dt: 1.0 / 60.0,
@@ -55,6 +108,9 @@ pub struct CollisionPlugin;
 
 impl Plugin for CollisionPlugin {
   fn build(&self, app: &mut App) {
-    app.add_startup_system(configure_rapier).add_system(display_events);
+    app
+      .add_startup_system(configure_rapier)
+      .add_system(contact_force_events)
+      .add_system(collision_events.after(contact_force_events));
   }
 }

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use smooth_bevy_cameras::controllers::fps::{FpsCameraBundle, FpsCameraController};
 
-use super::game::{Consumer, SpawnerBuilder};
+use super::game::{Consumer, MutatorScreen, ProductShape, SpawnerBuilder};
 
 pub fn setup_graphics(
   mut commands: Commands,
@@ -59,4 +59,11 @@ pub fn setup_graphics(
     .insert(Collider::cuboid(2.0, 2.0, 2.0))
     .insert(bevy_mod_picking::PickableBundle::default())
     .insert(bevy_transform_gizmo::GizmoTransformable);
+
+  MutatorScreen::Shape(ProductShape::Cylinder).into_entity(
+    &mut commands,
+    &mut meshes,
+    &mut materials,
+    [0.0, 5.0, 10.0],
+  );
 }
