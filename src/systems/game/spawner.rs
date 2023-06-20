@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use derive_builder::Builder;
 use uuid::Uuid;
 
-use super::{GameState, Product};
+use super::{GameState, MarkForDespawn, Product};
 
 /// Produces [Product]
 #[derive(Component, Builder)]
@@ -24,6 +24,28 @@ impl Default for Spawner {
       max_spawned: 3,
       product_template: Default::default(),
     }
+  }
+}
+
+impl Spawner {
+  pub fn into_entity<V: Into<Vec3> + Clone>(
+    self,
+    commands: &mut Commands,
+    meshes: &mut Assets<Mesh>,
+    materials: &mut Assets<StandardMaterial>,
+    position: V,
+  ) -> Entity {
+    commands
+      .spawn(PbrBundle {
+        mesh: meshes.add(shape::Cube::new(4.0).into()),
+        material: materials.add(Color::BLUE.into()),
+        transform: Transform::from_translation(position.into()),
+        ..Default::default()
+      })
+      .insert(self)
+      .insert(bevy_mod_picking::PickableBundle::default())
+      .insert(bevy_transform_gizmo::GizmoTransformable)
+      .id()
   }
 }
 
@@ -72,7 +94,9 @@ fn clear_products(
   mut event: EventReader<ClearProducts>,
 ) {
   for _ev in event.iter() {
-    active_products.for_each(|e| commands.entity(e).despawn());
+    active_products.for_each(|e| {
+      commands.entity(e).insert(MarkForDespawn);
+    });
   }
 }
 

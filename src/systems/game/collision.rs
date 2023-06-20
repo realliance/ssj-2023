@@ -3,6 +3,9 @@ use bevy_rapier3d::{prelude::*, rapier::prelude::CollisionEventFlags};
 
 use super::{Consumer, GameState, MutatorScreen, Product};
 
+#[derive(Component)]
+pub struct MarkForDespawn;
+
 fn contact_force_events(
   mut commands: Commands,
   mut state: ResMut<GameState>,
@@ -38,7 +41,7 @@ fn contact_force_events(
 
     if sensor.is_ok() {
       state.currency += product.payment();
-      commands.entity(product_ent).despawn();
+      commands.entity(product_ent).insert(MarkForDespawn);
     }
   }
 }
@@ -96,6 +99,10 @@ fn collision_events(
   }
 }
 
+fn handle_marked_for_deletion(mut commands: Commands, query: Query<Entity, With<MarkForDespawn>>) {
+  query.for_each(|e| commands.entity(e).despawn());
+}
+
 fn configure_rapier(mut rapier_config: ResMut<RapierConfiguration>) {
   rapier_config.timestep_mode = TimestepMode::Interpolated {
     dt: 1.0 / 60.0,
@@ -111,6 +118,7 @@ impl Plugin for CollisionPlugin {
     app
       .add_startup_system(configure_rapier)
       .add_system(contact_force_events)
-      .add_system(collision_events.after(contact_force_events));
+      .add_system(collision_events.after(contact_force_events))
+      .add_system(handle_marked_for_deletion.in_base_set(PhysicsSet::Writeback));
   }
 }

@@ -35,35 +35,10 @@ pub fn setup_graphics(
     ..Default::default()
   });
 
-  commands
-    .spawn(PbrBundle {
-      mesh: meshes.add(shape::Cube::new(4.0).into()),
-      material: materials.add(Color::BLUE.into()),
-      transform: Transform::from_xyz(0.0, 25.0, 5.0),
-      ..Default::default()
-    })
-    .insert(SpawnerBuilder::default().build().unwrap())
-    .insert(bevy_mod_picking::PickableBundle::default())
-    .insert(bevy_transform_gizmo::GizmoTransformable);
+  SpawnerBuilder::default()
+    .build()
+    .unwrap()
+    .into_entity(&mut commands, &mut meshes, &mut materials, [0.0, 25.0, 5.0]);
 
   Consumer::into_entity(&mut commands, &mut meshes, &mut materials, [0.0, 0.0, 5.0]);
-
-  commands
-    .spawn(PbrBundle {
-      mesh: meshes.add(shape::Cube::new(4.0).into()),
-      material: materials.add(Color::SILVER.into()),
-      transform: Transform::from_xyz(15.0, 10.0, 5.0),
-      ..Default::default()
-    })
-    .insert(RigidBody::Fixed)
-    .insert(Collider::cuboid(2.0, 2.0, 2.0))
-    .insert(bevy_mod_picking::PickableBundle::default())
-    .insert(bevy_transform_gizmo::GizmoTransformable);
-
-  MutatorScreen::Shape(ProductShape::Cylinder).into_entity(
-    &mut commands,
-    &mut meshes,
-    &mut materials,
-    [0.0, 5.0, 10.0],
-  );
 }

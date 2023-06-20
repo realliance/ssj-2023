@@ -7,6 +7,15 @@ pub struct GameState {
 
   /// Run Spawners?
   pub run: bool,
+
+  /// Show shop?
+  pub show_shop: bool,
+
+  /// Won Game?
+  pub won: bool,
+
+  // Show Start Game Pop Up?
+  pub start_popup: bool,
 }
 
 impl GameState {
@@ -19,7 +28,10 @@ impl Default for GameState {
   fn default() -> Self {
     Self {
       currency: Default::default(),
-      run: true,
+      show_shop: false,
+      run: false,
+      won: false,
+      start_popup: true,
     }
   }
 }

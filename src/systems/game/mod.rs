@@ -24,6 +24,9 @@ pub use screen::*;
 mod ui;
 pub use ui::*;
 
+mod shop;
+pub use shop::*;
+
 pub struct GameplayPlugins;
 
 impl PluginGroup for GameplayPlugins {

@@ -136,6 +136,7 @@ impl Product {
   pub fn payment(&self) -> u32 {
     (self.shape.base_value()
       * self.hit_mult
+      * self.hit_count as f32
       * (1.0 + (self.bounce - 1.0).abs())
       * (1.0 + (self.friction - 1.0).abs())
       * (1.0 + (self.mass - 1.0).abs()))
@@ -143,6 +144,7 @@ impl Product {
   }
 
   pub fn add_hit_mult(&mut self, force_mag: f32) {
+    self.hit_count += 1;
     self.hit_mult += force_mag / 10000.0;
   }
 

@@ -23,6 +23,8 @@ uuid = { version = "1", features = ["v4"] }
 bevy_transform_gizmo = "0.6"
 bevy_mod_picking = "0.12"
 bevy_egui = "0.20"
+serde = { version = "1", features = ["derive"] }
+toml = "0.7"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = { version = "0.2", features = [ "serde-serialize" ] }
